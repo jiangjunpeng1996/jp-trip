@@ -10,11 +10,15 @@
   "dependencies": {
     "normalize.css": "^8.0.1",
     "pinia": "^2.0.33",
+    "vant": "^4.1.0",
     "vue": "^3.2.47",
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^4.0.0",
+    "sass": "^1.59.2",
+    "sass-loader": "^13.2.0",
+    "unplugin-vue-components": "^0.24.1",
     "vite": "^4.1.4"
   }
 }
