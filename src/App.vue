@@ -1,8 +1,8 @@
 <template>
   <div class="app">
     <router-view></router-view>
-    <!-- <tab-bar v-if="!route.meta.hideTabBar"/> -->
-    <tab-bar />
+    <tab-bar v-if="!route.meta.hideTabBar"/>
+    <!-- <tab-bar /> -->
   </div>
 </template>
 
