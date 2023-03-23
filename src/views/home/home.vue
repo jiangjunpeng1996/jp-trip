@@ -1,5 +1,5 @@
 <template>
-  <div class="home">
+  <div class="home" ref="homeRef">
     <home-nav-bar />
     <div class="banner">
       <img src="@/assets/img/home/banner.webp">
@@ -15,9 +15,15 @@
   </div>
 </template>
 
+<script>
+export default {
+  name: "home"
+}
+</script>
+
 <script setup>
 
-  import { onMounted, onUnmounted, ref, watch, computed } from 'vue';
+  import { onMounted, onUnmounted, ref, watch, computed, onActivated } from 'vue';
   import HomeNavBar from './components/home-nav-bar.vue';
   import HomeSearchBox from './components/home-search-box.vue';
   import HomeCategories from './components/home-categories.vue';
@@ -59,7 +65,8 @@
   //   homeStore.fetchHouseListData()
   // })
 
-  const { isReachBottom, scrollTop } = useScroll()
+  const homeRef = ref()
+  const { isReachBottom, scrollTop } = useScroll(homeRef)
   watch(isReachBottom, (newValue) => {
     if(newValue) {
       homeStore.fetchHouseListData().then(() => {
@@ -76,6 +83,13 @@
   // 定义的可响应式的数据，依赖另外一个可响应式的数据，那么可以使用计算属性（computed）
   const isShowSearchBar = computed(() => {
     return scrollTop.value >= 360
+  })
+
+  // 跳转会home时，保留原来的位置
+  onActivated(() => {
+    homeRef.value?.scrollTo({
+      top: scrollTop.value
+    })
   })
 
 
@@ -102,6 +116,9 @@
 <style lang="scss" scoped>
 .home {
   padding-bottom: 60px;
+  height: 100vh;
+  box-sizing: border-box;
+  overflow-y: auto;
   .banner {
     img {
       width: 100%;

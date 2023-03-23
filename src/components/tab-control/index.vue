@@ -2,7 +2,7 @@
   <div class="tab-control">
     <template v-for="(item, index) in titles" :key="item">
       <div class="tab-control-item"
-           :class="{ active: index === currentIndex }"
+           :class="{ active: index === tabIndex }"
            @click="itemClick(index)">
         <span>{{ item }}</span>
       </div>
@@ -11,6 +11,8 @@
 </template>
 
 <script setup>
+import useMainStore from '@/stores/modules/main';
+import { storeToRefs } from 'pinia';
 import { ref } from 'vue';
 
 defineProps({
@@ -20,10 +22,11 @@ defineProps({
   }
 })
 
-let currentIndex = ref(0)
+const mainStore = useMainStore()
+const { tabIndex } = storeToRefs(mainStore)
 const emit = defineEmits(["tabItemClick"])
 const itemClick = (index) => {
-  currentIndex.value = index;
+  tabIndex.value = index;
   emit("tabItemClick", index)
 }
 </script>

@@ -5,6 +5,7 @@
       class="tabs"
       :titles="names"
       @tabItemClick="tabClick"
+      ref="tabControlRef"
     />
 
     <van-nav-bar 
@@ -48,8 +49,10 @@
 
   import { useRoute, useRouter } from 'vue-router';
   import { getDetailInfos } from "@/services"
-  import { computed, ref } from 'vue';
+  import { computed, ref, watch } from 'vue';
   import useScroll from '@/hooks/useScroll';
+  import useMainStore from '@/stores/modules/main';
+import { storeToRefs } from 'pinia';
 
   const route = useRoute()
   const router = useRouter()
@@ -80,12 +83,12 @@
   //   sectionEls.push(value.$el)
   // }
   // const tabClick = (index) => {
-  //   let instance = sectionEls[index].offsetTop
+  //   let distance = sectionEls[index].offsetTop
   //   if(index !== 0) {
-  //     instance = instance - 44
+  //     distance = distance - 44
   //   }
   //   detailRef.value.scrollTo({
-  //     top: instance,
+  //     top: distance,
   //     behavior: "smooth"
   //   })
   // }
@@ -95,21 +98,50 @@
     return Object.keys(sectionEls.value)
   })
   const getSectionRef = (value) => {
-    const name = value.$el.getAttribute("name")
-    sectionEls.value[name] = value.$el
+    if(value) {
+      const name = value.$el.getAttribute("name")
+      sectionEls.value[name] = value.$el
+    }
   }
+  let isClick = false
+  let currentDistance = -1
   const tabClick = (index) => {
     const key = Object.keys(sectionEls.value)[index]
     const el = sectionEls.value[key]
-    let instance = el.offsetTop
+    let distance = el.offsetTop
     if(index !== 0) {
-      instance = instance - 44
+      distance = distance - 44
     }
+    isClick = true
+    currentDistance = distance
     detailRef.value.scrollTo({
-      top: instance,
+      top: distance,
       behavior: "smooth"
     })
   }
+
+  // 页面滚动时匹配对应的tabControl对应的index
+  const mainStore = useMainStore()
+  const { tabIndex } = storeToRefs(mainStore)
+  const tabControlRef = ref()
+  watch(scrollTop, (newValue) => {
+    if(newValue === currentDistance) {
+      isClick = false
+    }
+    if(isClick) return
+    // 获取所有的区域的offsetTop
+    const els = Object.values(sectionEls.value)
+    const values = els.map(el => el.offsetTop)
+    // 根据newValue去匹配想要的索引
+    let index = values.length - 1
+    for(let i = 0; i < values.length; i++) {
+      if(values[i] >= newValue + 44) {
+        index = i - 1
+        break;
+      }
+    }
+    tabIndex.value = index;
+  })
   
 </script>
 
